@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'ball.dart';
 import 'bat.dart';
 
+enum Direction { up, down, left, right }
+
 class Pong extends StatefulWidget {
   @override
   _PongState createState() => _PongState();
@@ -20,23 +22,26 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
   Animation<double> animation;
   AnimationController controller;
 
+  Direction vDir = Direction.down;
+  Direction hDir = Direction.right;
+
+  double increment = 5;
+
   @override
   void initState() {
     posX = 0;
     posY = 0;
     controller = AnimationController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 10000),
       vsync: this,
     );
-    animation = Tween<double> (
-      begin: 0,
-      end: 100
-    ).animate(controller);
-    animation.addListener(() { 
+    animation = Tween<double>(begin: 0, end: 100).animate(controller);
+    animation.addListener(() {
       setState(() {
-        posX++;
-        posY++;
+        (hDir == Direction.right) ? posX += increment : posX -= increment;
+        (vDir == Direction.down) ? posY += increment : posY -= increment;
       });
+      checkBorders();
     });
     controller.forward();
     super.initState();
@@ -46,11 +51,10 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-
         width = constraints.maxWidth;
         height = constraints.maxHeight;
-        batWidth = width/5;
-        batHeight = height/20;
+        batWidth = width / 5;
+        batHeight = height / 20;
 
         return Stack(
           children: <Widget>[
@@ -67,5 +71,20 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
         );
       },
     );
+  }
+
+  void checkBorders() {
+    if (posX <= 0 && hDir == Direction.left) {
+      hDir = Direction.right;
+    }
+    if (posX >= width - 50 && hDir == Direction.right) {
+      hDir = Direction.left;
+    }
+    if (posY >= height - 50 && vDir == Direction.down) {
+      vDir = Direction.up;
+    }
+    if (posY <= 0 && vDir == Direction.up) {
+      vDir = Direction.down;
+    }
   }
 }
