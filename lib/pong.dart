@@ -8,7 +8,7 @@ class Pong extends StatefulWidget {
   _PongState createState() => _PongState();
 }
 
-class _PongState extends State<Pong> {
+class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
   double width;
   double height;
   double posX = 0;
@@ -16,6 +16,31 @@ class _PongState extends State<Pong> {
   double batWidth = 0;
   double batHeight = 0;
   double batPosition = 0;
+
+  Animation<double> animation;
+  AnimationController controller;
+
+  @override
+  void initState() {
+    posX = 0;
+    posY = 0;
+    controller = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    );
+    animation = Tween<double> (
+      begin: 0,
+      end: 100
+    ).animate(controller);
+    animation.addListener(() { 
+      setState(() {
+        posX++;
+        posY++;
+      });
+    });
+    controller.forward();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +56,8 @@ class _PongState extends State<Pong> {
           children: <Widget>[
             Positioned(
               child: Ball(),
-              top: 0,
+              top: posX,
+              left: posX,
             ),
             Positioned(
               child: Bat(batWidth, batHeight),
