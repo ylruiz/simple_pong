@@ -22,6 +22,7 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
   double increment = 5;
   double randX = 1;
   double randY = 1;
+  int score = 0;
 
   Animation<double> animation;
   AnimationController controller;
@@ -61,6 +62,11 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
         return Stack(
           children: <Widget>[
             Positioned(
+              child: Text('Score: $score'),
+              top: 0,
+              right: 24,
+            ),
+            Positioned(
               child: Ball(),
               top: posY,
               left: posX,
@@ -95,6 +101,9 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
           posX <= (batPosition + batWidth + diameter)) {
         vDir = Direction.up;
         randY = randomNumber();
+        safeSetState(() {
+          score++;
+        });
       } else {
         controller.stop();
         dispose();
