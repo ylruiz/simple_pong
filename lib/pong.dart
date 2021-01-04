@@ -18,14 +18,13 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
   double batWidth = 0;
   double batHeight = 0;
   double batPosition = 0;
+  double increment = 5;
 
   Animation<double> animation;
   AnimationController controller;
 
   Direction vDir = Direction.down;
   Direction hDir = Direction.right;
-
-  double increment = 5;
 
   @override
   void initState() {
@@ -37,7 +36,7 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
     );
     animation = Tween<double>(begin: 0, end: 100).animate(controller);
     animation.addListener(() {
-      setState(() {
+      safeSetState(() {
         (hDir == Direction.right) ? posX += increment : posX -= increment;
         (vDir == Direction.down) ? posY += increment : posY -= increment;
       });
@@ -60,13 +59,14 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
           children: <Widget>[
             Positioned(
               child: Ball(),
-              top: posX,
+              top: posY,
               left: posX,
             ),
             Positioned(
               child: GestureDetector(
-                child:  Bat(batWidth, batHeight),
-                onHorizontalDragUpdate: (DragUpdateDetails update) => moveBat(update),
+                child: Bat(batWidth, batHeight),
+                onHorizontalDragUpdate: (DragUpdateDetails update) =>
+                    moveBat(update),
               ),
               bottom: 0,
               left: batPosition,
@@ -78,22 +78,29 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
   }
 
   void checkBorders() {
+    double diameter = 50;
     if (posX <= 0 && hDir == Direction.left) {
       hDir = Direction.right;
     }
-    if (posX >= width - 50 && hDir == Direction.right) {
+    if (posX >= (width - diameter) && hDir == Direction.right) {
       hDir = Direction.left;
     }
-    if (posY >= height - 50 && vDir == Direction.down) {
-      vDir = Direction.up;
+    if (posY >= (height - diameter) && vDir == Direction.down) {
+      if (posX >= (batPosition - diameter) &&
+          posX <= (batPosition + batWidth + diameter)) {
+        vDir = Direction.up;
+      } else {
+        controller.stop();
+        dispose();
+      }
     }
     if (posY <= 0 && vDir == Direction.up) {
       vDir = Direction.down;
     }
   }
 
-  void moveBat (DragUpdateDetails update) {
-    setState(() {
+  void moveBat(DragUpdateDetails update) {
+    safeSetState(() {
       batPosition += update.delta.dx;
     });
   }
@@ -102,5 +109,13 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  void safeSetState(Function function) {
+    if (mounted && controller.isAnimating) {
+      setState(() {
+        function();
+      });
+    }
   }
 }
