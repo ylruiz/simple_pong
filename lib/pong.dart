@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math';
 
 import 'ball.dart';
@@ -165,8 +166,7 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
             FlatButton(
               child: Text('No'),
               onPressed: () {
-                Navigator.of(context).pop();
-                dispose();
+                SystemChannels.platform.invokeMethod('SystemNavigator.pop');
               }, 
             ),
           ],
