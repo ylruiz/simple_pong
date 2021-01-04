@@ -63,7 +63,7 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
           children: <Widget>[
             Positioned(
               child: Text('Score: $score'),
-              top: 0,
+              top: 10,
               right: 24,
             ),
             Positioned(
@@ -96,7 +96,7 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
       hDir = Direction.left;
       randX = randomNumber();
     }
-    if (posY >= (height - diameter) && vDir == Direction.down) {
+    if (posY >= (height - diameter - batHeight) && vDir == Direction.down) {
       if (posX >= (batPosition - diameter) &&
           posX <= (batPosition + batWidth + diameter)) {
         vDir = Direction.up;
