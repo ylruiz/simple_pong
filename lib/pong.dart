@@ -64,8 +64,12 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
               left: posX,
             ),
             Positioned(
-              child: Bat(batWidth, batHeight),
+              child: GestureDetector(
+                child:  Bat(batWidth, batHeight),
+                onHorizontalDragUpdate: (DragUpdateDetails update) => moveBat(update),
+              ),
               bottom: 0,
+              left: batPosition,
             ),
           ],
         );
@@ -86,5 +90,17 @@ class _PongState extends State<Pong> with SingleTickerProviderStateMixin {
     if (posY <= 0 && vDir == Direction.up) {
       vDir = Direction.down;
     }
+  }
+
+  void moveBat (DragUpdateDetails update) {
+    setState(() {
+      batPosition += update.delta.dx;
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }
